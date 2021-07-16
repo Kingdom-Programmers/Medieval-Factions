@@ -5,6 +5,7 @@ import dansplugins.factionsystem.utils.Pair;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 public class LocaleManager {
@@ -106,19 +107,17 @@ public class LocaleManager {
     }
 
     private void loadFromFile(File file) {
+//        System.out.println("DEBUG: Loading from " + file.toString());
         try {
-            Scanner reader = new Scanner(file);
+            List<String> lines = Files.readAllLines(file.toPath());
 
-            while (reader.hasNextLine()) {
-                String line = reader.nextLine();
+            for (String line : lines) {
                 Pair<String, String> pair = getPairFromLine(line);
                 if (pair != null && !strings.containsKey(pair.getLeft())) {
                     strings.put(pair.getLeft(), pair.getRight());
                     keys.add(pair.getLeft());
                 }
             }
-
-            reader.close();
 
         } catch (Exception e) {
             System.out.println("DEBUG: Something went wrong loading from file!");
