@@ -120,6 +120,9 @@ public class ConfigManager {
         if (!MedievalFactions.getInstance().getConfig().isBoolean("territoryAlertPopUp")) {
             MedievalFactions.getInstance().getConfig().addDefault("territoryAlertPopUp", true);
         }
+        if (!MedievalFactions.getInstance().getConfig().isBoolean("territoryIndicatorActionbar")) {
+            MedievalFactions.getInstance().getConfig().addDefault("territoryIndicatorActionbar", true);
+        }
         if (!MedievalFactions.getInstance().getConfig().isString("territoryAlertColor")) {
             MedievalFactions.getInstance().getConfig().addDefault("territoryAlertColor", "white");
         }

@@ -5,11 +5,16 @@ import dansplugins.factionsystem.Messenger;
 import dansplugins.factionsystem.data.EphemeralData;
 import dansplugins.factionsystem.data.PersistentData;
 import dansplugins.factionsystem.events.FactionJoinEvent;
+import dansplugins.factionsystem.managers.ActionBarManager;
 import dansplugins.factionsystem.managers.ChunkManager;
 import dansplugins.factionsystem.managers.LocaleManager;
 import dansplugins.factionsystem.objects.Faction;
 import dansplugins.factionsystem.objects.PlayerActivityRecord;
 import dansplugins.factionsystem.objects.PlayerPowerRecord;
+import dansplugins.factionsystem.utils.ColorChecker;
+import dansplugins.factionsystem.utils.TerritoryOwnerNotifier;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Monster;
@@ -86,10 +91,27 @@ public class JoiningLeavingAndSpawningHandler implements Listener {
         	}
         }
 
+        setPlayerActionBarTerritoryInfo(event.getPlayer());
+
         ChunkManager.getInstance().informPlayerIfTheirLandIsInDanger(player, PersistentData.getInstance().getFactions(), PersistentData.getInstance().getClaimedChunks());
 
         informPlayerIfTheirFactionIsWeakened(player);
     }
+
+    private void setPlayerActionBarTerritoryInfo(Player player) {
+		if(MedievalFactions.getInstance().getConfig().getBoolean("territoryIndicatorActionbar")) {
+			// if chunk is claimed
+			if (ChunkManager.getInstance().isClaimed(player.getLocation().getChunk(), PersistentData.getInstance().getClaimedChunks())) {
+				String factionName = ChunkManager.getInstance().getClaimedChunk(player.getLocation().getChunk()).getHolder();
+				Faction holder = PersistentData.getInstance().getFaction(factionName);
+				TerritoryOwnerNotifier.getInstance().sendPlayerTerritoryAlert(player, holder);
+				return;
+			}
+
+			// Otherwise the chunk ist unclaimed
+			TerritoryOwnerNotifier.getInstance().sendPlayerTerritoryAlert(player, null);
+		}
+	}
 
     private void informPlayerIfTheirFactionIsWeakened(Player player) {
 		Faction playersFaction = PersistentData.getInstance().getPlayersFaction(player.getUniqueId());
@@ -152,6 +174,8 @@ public class JoiningLeavingAndSpawningHandler implements Listener {
 		{
 			record.setLastLogout(ZonedDateTime.now());
 		}
+
+		ActionBarManager.getInstance(MedievalFactions.getInstance()).clearPlayerActionBar(event.getPlayer());
 	}
 
 	@EventHandler()
